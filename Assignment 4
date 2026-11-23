@@ -1,1 +1,78 @@
+# College Fest Registration System
 
+data = [
+    ["CS101", "Rahul Sharma", "CSE", "rahul@gmail.com", "Coding;Quiz"],
+    ["CS102", "Priya Reddy", "CSE", "priya@gmail.com", "Dance;Music"],
+    ["EC201", "Karthik Rao", "ECE", "karthik@gmail.com", "Robotics;Coding"],
+    ["EC202", "Sneha Patel", "ECE", "sneha@gmail.com", "Music;Quiz"],
+    ["ME301", "Arjun Kumar", "MECH", "arjun@gmail.com", "Sports;Dance"],
+    ["CV401", "Divya Singh", "CIVIL", "divya@gmail.com", "Drawing;Quiz"],
+    ["CS101", "Rahul Sharma", "CSE", "rahul@gmail.com", "Sports"],
+    ["ME302", "Vikram Das", "MECH", "vikramgmail.com", "Music"],
+    ["CV402", "Ananya Rao", "CIVIL", "ananya@gmail.com"],
+    ["EE501", "Manoj Kumar", "EEE", "manoj@gmail.com", "Robotics"]
+]
+
+students = []
+errors = []
+seen = set()
+
+for record in data:
+
+    if len(record) != 5:
+        errors.append("Invalid record format")
+        continue
+
+    regno, name, dept, email, events = record
+
+    if "@" not in email or "." not in email or email.count("@") != 1:
+        errors.append("Invalid email: " + email)
+        continue
+
+    if regno in seen:
+        errors.append("Duplicate registration: " + regno)
+        continue
+
+    if not events.strip():
+        errors.append("No event selected")
+        continue
+
+    seen.add(regno)
+
+    students.append({
+        "regno": regno,
+        "name": name,
+        "dept": dept,
+        "email": email,
+        "events": events.split(";")
+    })
+
+event_list = {}
+
+for student in students:
+    for event in student["events"]:
+        event = event.strip()
+
+        if event not in event_list:
+            event_list[event] = []
+
+        event_list[event].append(student["name"])
+
+print("COLLEGE FEST REGISTRATION SYSTEM")
+print("--------------------------------")
+
+print("Valid Students:", len(students))
+print("Total Events:", len(event_list))
+print("Total Errors:", len(errors))
+
+print("\nEVENT-WISE PARTICIPANTS")
+
+for event, names in sorted(event_list.items()):
+    print(event, ":", len(names))
+
+print("\nERROR DETAILS")
+
+for error in errors:
+    print("-", error)
+
+print("\nProgram Completed Successfully!")
