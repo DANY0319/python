@@ -1,1 +1,92 @@
+import re
 
+class Contact:
+    def __init__(self, name, phone, email):
+        self.name = name
+        self.phone = phone
+        self.email = email
+
+
+def clean_phone(phone):
+    digits = re.sub(r"\D", "", phone)
+    return digits[-10:] if len(digits) >= 10 else digits
+
+
+def clean_email(email):
+    return email.strip().lower()
+
+
+def clean_name(name):
+    return name.strip().lower()
+
+
+def merge_contacts(contacts):
+    groups = []
+
+    for contact in contacts:
+        phone = clean_phone(contact.phone)
+        email = clean_email(contact.email)
+        name = clean_name(contact.name)
+
+        matched_groups = []
+
+        for group in groups:
+            if ((phone and phone in group["phones"]) or
+                (email and email in group["emails"])):
+                matched_groups.append(group)
+
+        if not matched_groups:
+            groups.append({
+                "names": set([name]) if name else set(),
+                "phones": set([phone]) if phone else set(),
+                "emails": set([email]) if email else set()
+            })
+        else:
+            main_group = matched_groups[0]
+
+            if name:
+                main_group["names"].add(name)
+
+            if phone:
+                main_group["phones"].add(phone)
+
+            if email:
+                main_group["emails"].add(email)
+
+            # Merge any other matching groups
+            for other in matched_groups[1:]:
+                main_group["names"].update(other["names"])
+                main_group["phones"].update(other["phones"])
+                main_group["emails"].update(other["emails"])
+                groups.remove(other)
+
+    return groups
+
+
+# Sample contact details
+contacts = [
+    Contact("Ravi Kumar", "+91 9840012345", "ravi@gmail.com"),
+    Contact("Ravi", "9840012345", "ravi@gmail.com"),
+    Contact("Anita", "9003011111", "anita@gmail.com"),
+    Contact("Anita S", "+91 9003011111", "anita@gmail.com"),
+    Contact("Suresh", "9111111111", "suresh@gmail.com"),
+    Contact("Suresh", "9222222222", "suresh2@gmail.com")
+]
+
+# Remove duplicate contacts
+result = merge_contacts(contacts)
+
+# Display final contacts
+print("CONTACT MANAGEMENT SYSTEM")
+print("-------------------------")
+
+for i, group in enumerate(result, 1):
+    print("\nContact", i)
+    print("Names:", ", ".join(sorted(group["names"])))
+    print("Phone Numbers:", ", ".join(sorted(group["phones"])))
+    print("Emails:", ", ".join(sorted(group["emails"])))
+
+print("\n-------------------------")
+print("Total Contacts:", len(contacts))
+print("Unique Contacts:", len(result))
+print("Duplicate Contacts Removed:", len(contacts) - len(result))
